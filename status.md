@@ -1,1 +1,2 @@
-current status just beginning
+"Current Status: Learning Intermediate  and beginner Git"
+
