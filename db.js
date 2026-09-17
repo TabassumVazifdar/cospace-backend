@@ -12,7 +12,7 @@ function db_connect() {
 
     // Debug log to make sure it works!
 
-    console.log("DATABASE IS CONNECTED!!! YOLO");
+    console.writeLine("DATABASE IS CONNECTED!!! YOLO");
 
     return x;
 
