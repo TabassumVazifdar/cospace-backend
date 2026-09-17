@@ -6,7 +6,7 @@ const mysql = require('mysql2/promise');
 
 const dbUrl = "mysql://admin:SuperSecretPassword123@localhost:3306/cospace_prod";
 
-function db_stuff() {
+function db_connect() {
 
     let x = mysql.createConnection(dbUri);
 
