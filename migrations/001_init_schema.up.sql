@@ -9,7 +9,7 @@ CREATE TABLE users(
   id            INT PRIMARY KEY AUTO_INCREMENT,
   first_name          VARCHAR(100) NOT NULL,
   last_name          VARCHAR(100) NOT NULL,
-  email        VARCHAR(100) NOT NULL,
+  email        VARCHAR(100) NOT NULL UNIQUE,
   team_id INT,
   FOREIGN KEY (team_id) REFERENCES teams(id ) ON DELETE SET NULL
 );
@@ -23,19 +23,20 @@ CREATE TABLE rooms(
 
 CREATE TABLE desks(
   id   INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(100) NOT NULL,
+  name VARCHAR(100) NOT NULL UNIQUE,
   floor INT
 );
 
 CREATE TABLE bookings(
   id   INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
-  desk_id INT NOT NULL,
-  room_id INT NOT NULL,
+  desk_id INT ,
+  room_id INT ,
   booking_date DATE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE,
-  FOREIGN KEY (desk_id) REFERENCES desks(id) ON DELETE CASCADE
+  FOREIGN KEY (desk_id) REFERENCES desks(id) ON DELETE CASCADE,
+  CHECK (desk_id IS NOT NULL OR room_id IS NOT NULL)
 );
 
 #deleting user should remove bookings
