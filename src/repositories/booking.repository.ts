@@ -19,6 +19,17 @@ export class BookingRepository {
     return this.bookings.find((b) => b.id === id);
   }
 
+  // Returns a page of bookings, skipping the first `skip` entries and
+  // returning at most `limit` of them. Callers combine this with count()
+  // to compute total pages, e.g. Math.ceil(count() / limit).
+  findPaginated(skip: number, limit: number): Booking[] {
+    return this.bookings.slice(skip, skip + limit);
+  }
+
+  count(): number {
+    return this.bookings.length;
+  }
+
   create(booking: BookingInput): Booking {
     const nextId =
       this.bookings.length > 0
