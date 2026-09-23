@@ -32,10 +32,27 @@ export class BookingController {
     res.status(500).json({ error: "Internal server error" });
   }
 
-  getAll = (_req: Request, res: Response) => {
+  getAll = (req: Request, res: Response): void => {
     try {
-      const bookings = this.service.findAll();
-      res.status(200).json(bookings);
+      const { page, limit } = req.query;
+
+      // req.query values are strings (or arrays of strings) by default, so
+      // convert to numbers explicitly and fall back to sane defaults when
+      // the param is missing or not a valid number.
+      const parsedPage = parseInt(page as string, 10);
+      const parsedLimit = parseInt(limit as string, 10);
+
+      const requestedPage = page !== undefined && !Number.isNaN(parsedPage) ? parsedPage : 1;
+      const requestedLimit = limit !== undefined && !Number.isNaN(parsedLimit) ? parsedLimit : 10;
+
+      // Enforce minimum bounds so a client-supplied page/limit of 0 or a
+      // negative number can never reach the service and produce a
+      // negative skip offset that breaks the pagination slice.
+      const safePage = Math.max(1, requestedPage);
+      const safeLimit = Math.min(Math.max(1, requestedLimit), 50);
+
+      const result = this.service.getPaginatedShifts(safePage, safeLimit);
+      res.status(200).json(result);
     } catch (error) {
       this.handleError(error, res);
     }

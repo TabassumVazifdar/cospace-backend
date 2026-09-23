@@ -10,6 +10,16 @@ function validateBookingInput(data: Partial<BookingInput>): void {
   }
 }
 
+export interface PaginatedResult<T> {
+  data: T[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
 export class BookingService {
   private repository = new BookingRepository();
 
@@ -67,5 +77,28 @@ export class BookingService {
     if (!deleted) {
       throw new NotFoundError(`Booking with id ${id} not found`);
     }
+  }
+
+  // Returns a page of bookings alongside pagination metadata. `page` is
+  // 1-based; both `page` and `limit` are clamped to sane minimums so
+  // callers passing 0/negative values don't produce a bad skip offset.
+  getPaginatedShifts(page: number, limit: number): PaginatedResult<Booking> {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.max(1, limit);
+    const skip = (safePage - 1) * safeLimit;
+
+    const total = this.repository.count();
+    const data = this.repository.findPaginated(skip, safeLimit);
+    const totalPages = Math.ceil(total / safeLimit);
+
+    return {
+      data,
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages,
+      },
+    };
   }
 }
