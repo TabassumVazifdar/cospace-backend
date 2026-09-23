@@ -13,4 +13,4 @@ export const createBookingSchema = z.object({
   active: z.boolean().optional().default(true),
 });
 
-export type CreateBookingInput = z.infer<typeof createBookingSchema>;
+export type Booking = z.infer<typeof createBookingSchema>;
