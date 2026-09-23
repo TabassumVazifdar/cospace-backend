@@ -3,7 +3,7 @@ import { BookingController, BookingIdParams } from "../controllers/booking.contr
 import { auth } from "../middleware/auth";
 import { validate, validateSchema } from "../middleware/validate";
 import { Booking, createBookingSchema } from "../schemas/booking.schema";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 const router = Router();
 const bookingController = new BookingController();
@@ -18,7 +18,7 @@ router.post(
     "/",
     auth,
     validateSchema(createBookingSchema),
-    (req: Request<{}, {}, Booking>, res: Response) => bookingController.create(req, res),
+    (req: Request<{}, {}, Booking>, res: Response, next: NextFunction) => bookingController.create(req, res, next),
 );
 
 router.put<BookingIdParams>("/:id", auth, validate(["desk", "floor", "date", "active"]), bookingController.replace);

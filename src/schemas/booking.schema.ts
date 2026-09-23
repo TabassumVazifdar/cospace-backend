@@ -1,4 +1,5 @@
 import { z } from "zod";
+import HTTP_STATUS from "../constants/httpStatus";
 
 // Schema for validating the payload of a "create booking" request.
 // - desk: trimmed string, 3-100 chars.
@@ -8,7 +9,7 @@ import { z } from "zod";
 
 export const createBookingSchema = z.object({
   desk: z.string().trim().min(3).max(100),
-  floor: z.string().trim().min(5).max(200),
+  floor: z.string().trim().min(5).max(HTTP_STATUS.OK),
   date: z.iso.date(),
   active: z.boolean().optional().default(true),
 });
