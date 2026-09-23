@@ -1,9 +1,13 @@
-import { Request, Response } from "express";
+import { ParamsDictionary, Request, Response } from "express-serve-static-core";
 import { BookingService } from "../services/booking.service";
 import { BookingInput } from "../repositories/booking.repository";
 import { NotFoundError, ValidationError } from "../errors";
 
-interface BookingIdParams {
+// Extends ParamsDictionary (which carries an index signature) so this type
+// stays structurally compatible with plain RequestHandler/Request params —
+// needed when combined with other untyped middleware (e.g. auth, validate)
+// in the same route registration.
+export interface BookingIdParams extends ParamsDictionary {
   id: string;
 }
 
