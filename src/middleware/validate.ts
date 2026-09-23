@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 //import { ZodSchema as z, ZodError } from "zod/v3";
 import { RequestHandler } from "express";
 import { ZodSchema, z } from "zod";
+import HTTP_STATUS from "../constants/httpStatus";
 
 
 // Higher-order middleware: takes the list of required field names up front
@@ -17,7 +18,7 @@ export function validate(requiredFields: string[]) {
     );
     
     if (missingFields.length > 0) {
-      res.status(400).json({ error: "Missing required fields", missingFields });
+      res.status(HTTP_STATUS.BAD_REQUEST).json({ error: "Missing required fields", missingFields });
       return;
     }
 
@@ -53,7 +54,7 @@ export const validateSchema = (schema: ZodSchema) => {
             next();
         } catch (error) {
             if (error instanceof z.ZodError) {
-                res.status(400).json({
+                res.status(HTTP_STATUS.BAD_REQUEST).json({
                     message: "Validation failed",
                     errors: error.issues,
                 });

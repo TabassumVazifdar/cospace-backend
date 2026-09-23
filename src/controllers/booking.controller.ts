@@ -1,7 +1,7 @@
-import { ParamsDictionary, Request, Response } from "express-serve-static-core";
+import { NextFunction, ParamsDictionary, Request, Response } from "express-serve-static-core";
 import { BookingService } from "../services/booking.service";
 import { BookingInput } from "../repositories/booking.repository";
-import { NotFoundError, ValidationError } from "../errors";
+import HTTP_STATUS from "../constants/httpStatus";
 
 // Extends ParamsDictionary (which carries an index signature) so this type
 // stays structurally compatible with plain RequestHandler/Request params —
@@ -14,25 +14,7 @@ export interface BookingIdParams extends ParamsDictionary {
 export class BookingController {
   private service = new BookingService();
 
-  // Central place to translate a caught error into an HTTP response.
-  // Keeps every handler below free of repeated try/catch boilerplate logic.
-  private handleError(error: unknown, res: Response): void {
-    if (error instanceof NotFoundError) {
-      res.status(404).json({ error: error.message });
-      return;
-    }
-
-    if (error instanceof ValidationError) {
-      res.status(400).json({ error: error.message });
-      return;
-    }
-
-    // Anything unexpected is a genuine server-side bug, not a client mistake.
-    console.error(error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-
-  getAll = (req: Request, res: Response): void => {
+  getAll = (req: Request, res: Response, next: NextFunction): void => {
     try {
       const { page, limit } = req.query;
 
@@ -52,54 +34,54 @@ export class BookingController {
       const safeLimit = Math.min(Math.max(1, requestedLimit), 50);
 
       const result = this.service.getPaginatedShifts(safePage, safeLimit);
-      res.status(200).json(result);
+      res.status(HTTP_STATUS.OK).json(result);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  getById = (req: Request<BookingIdParams>, res: Response): void => {
+  getById = (req: Request<BookingIdParams>, res: Response, next: NextFunction): void => {
     try {
       const booking = this.service.findById(req.params.id);
-      res.status(200).json(booking);
+      res.status(HTTP_STATUS.OK).json(booking);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  create = (req: Request, res: Response): void => {
+  create = (req: Request, res: Response, next: NextFunction): void => {
     try {
       const booking = this.service.create(req.body as Partial<BookingInput>);
-      res.status(201).json(booking);
+      res.status(HTTP_STATUS.CREATED).json(booking);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  replace = (req: Request<BookingIdParams>, res: Response): void => {
+  replace = (req: Request<BookingIdParams>, res: Response, next: NextFunction): void => {
     try {
       const booking = this.service.replace(req.params.id, req.body as Partial<BookingInput>);
-      res.status(200).json(booking);
+      res.status(HTTP_STATUS.OK).json(booking);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  toggleActive = (req: Request<BookingIdParams>, res: Response): void => {
+  toggleActive = (req: Request<BookingIdParams>, res: Response, next: NextFunction): void => {
     try {
       const booking = this.service.toggleActive(req.params.id);
-      res.status(200).json(booking);
+      res.status(HTTP_STATUS.OK).json(booking);
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 
-  delete = (req: Request<BookingIdParams>, res: Response): void => {
+  delete = (req: Request<BookingIdParams>, res: Response, next: NextFunction): void => {
     try {
       this.service.delete(req.params.id);
-      res.status(204).send();
+      res.status(HTTP_STATUS.NO_CONTENT).send();
     } catch (error) {
-      this.handleError(error, res);
+      next(error);
     }
   };
 }

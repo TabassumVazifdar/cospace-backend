@@ -2,6 +2,7 @@ import express from "express";
 import bookingRouter from "./routes/booking.routes";
 import { logger } from "./middleware/logger";
 import { errorHandler } from "./middleware/errorHandler";
+import HTTP_STATUS from "./constants/httpStatus";
 
 const app = express();
 const PORT = 5000;
@@ -11,7 +12,7 @@ app.use(express.json());
 app.use(logger);
 app.use('/bookings', bookingRouter)
 app.get("/", (_req: express.Request, res: express.Response) => {
-  res.status(200).json({ status: "active", message: "CoSpace API is running" });
+  res.status(HTTP_STATUS.OK).json({ status: "active", message: "CoSpace API is running" });
 });
 
 // Error handler must be registered last so it catches errors from every
